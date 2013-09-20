@@ -264,7 +264,7 @@ JAK.Debug.getBacktraceAsString = function() {
  */
 JAK.Debug.dump = function() {
 	for (var i = 0; i < arguments.length; i++) {
-		var ref = this.describe(arguments[i]);
+		var ref = JAK.Debug.describe(arguments[i]);
 		if (JAK.Debug.settings.stdout) {
 			JAK.Debug.settings.stdout.call(window, ref.toString());
 		}
