@@ -5,7 +5,9 @@ describe("JAS", function() {
 			expect((typeof obj)).toEqual("object");
 			expect(obj.param1).toEqual("value 1");
 			expect(obj.param2).toEqual("a=b");
-			expect(obj.param3).toEqual("second");
+			expect((typeof obj.param3)).toEqual("object");
+			expect(obj.param3[0]).toEqual("first");
+			expect(obj.param3[1]).toEqual("second");
 			expect(obj.param4).toEqual("");
 			expect(obj.param5).toEqual("");
 			expect((typeof obj.param6)).toEqual("object");

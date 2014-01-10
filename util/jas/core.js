@@ -59,7 +59,15 @@ JAS.Core.parseQs = function(qs) {
 				params[key].push(value);
 			}
 		} else {
-			params[key] = value;
+			if (params[key]) { // pokud jiz promenna stejneho jmena existuje, vytvorime pole
+				if (!(params[key] instanceof Array)) {
+					var tmp = params[key];
+					params[key] = [tmp];
+				}
+				params[key].push(value);
+			} else {
+				params[key] = value;
+			}
 		}
 	}
 	return params;
