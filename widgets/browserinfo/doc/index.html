@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+		<link rel="stylesheet" type="text/css" href="css/demopage.css" />
+		<link rel="stylesheet" type="text/css" href="../../modalwindow/doc/css/modalwindow.css" />
+
+		<link rel="stylesheet" type="text/css" href="../browserinfo.css" />
+		
+		<script type="text/javascript" src="../../../lib/jak.js"></script>
+		<script type="text/javascript" src="../../../util/cookie.js"></script>
+		<script type="text/javascript" src="../../modalwindow/modalwindow.js"></script>
+		<script type="text/javascript">
+			window.console.DEBUG = true;
+		</script>
+
+		<script type="text/javascript" src="../browserinfo.js"></script>
+		<script type="text/javascript">
+			var Bidemo = {};
+
+			Bidemo.processor = new JAK.BrowserInfo.Processor({ imgPath:"../img/" });
+			Bidemo.processor.setLinks({
+				win: {
+					gecko: {
+						seznam: "http://download.seznam.cz/firefox/release/seznam-firefox-win32-cs.exe",
+						common: "http://www.mozilla.cz/stahnout/firefox/"
+					},
+					chrome: {
+						common: "http://www.google.cz/chrome/?hl=cs"
+					},
+					opera: {
+						seznam: "http://download.seznam.cz/opera/Opera_1700_int_Setup.exe",
+						common: "http://www.opera.com/download/get/?partner=www&opsys=Windows"
+					},
+					ie64: {
+						seznam: "http://download.seznam.cz/ie/IE10-Setup-Seven64.exe",
+						common: "http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"
+					},
+					ie32: {
+						seznam: "http://download.seznam.cz/ie/IE10-Setup-Seven32.exe",
+						common: "http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"
+					},
+					ie: {
+						common: "http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"
+					}
+				},
+				mac: {
+					gecko: {
+						seznam: "http://download.seznam.cz/firefox/release/seznam-firefox-mac-cs.dmg",
+						common: "http://www.mozilla.cz/stahnout/firefox/"
+					},
+					chrome: {
+						common: "http://www.google.cz/chrome/?hl=cs"
+					},
+					opera: {
+						common: "http://www.opera.com/download/get/?partner=www&opsys=MacOS"
+					},
+					safari: {
+						common: "http://www.apple.com/safari/download/"
+					}
+				},
+				nix: {
+					gecko: {
+						seznam: "http://download.seznam.cz/firefox/release/seznam-firefox-linux-cs.bz2",
+						common: "http://www.mozilla.cz/stahnout/firefox/"
+					},
+					chrome: {
+						common: "http://www.google.cz/chrome/?hl=cs"
+					},
+					opera: {
+						common: "http://www.opera.com/download/guide/?os=linux"
+					}
+				}
+			});
+
+
+			Bidemo.run = function() {
+				Bidemo.clear();
+
+				var requirements = [
+					{ gecko: JAK.gel("gecko").value },
+					{ chrome: JAK.gel("chrome").value },
+					{ ie: JAK.gel("ie").value },
+					{ safari: JAK.gel("safari").value },
+					{ opera: JAK.gel("opera").value }
+				];
+				var preText  = JAK.gel("preText").value;
+				var linkText = JAK.gel("linkText").value;
+				var postText = JAK.gel("postText").value;
+				Bidemo.processor.setRecommended(requirements, preText, linkText, postText);
+				var result = Bidemo.processor.launch(JAK.gel("bibc"));
+				JAK.gel("result").value = result ? "Vyhovuje" : "Nevyhovuje";
+			};
+
+			Bidemo.clear = function() {
+				JAK.DOM.clear(JAK.gel("bibc"));
+				JAK.Cookie.getInstance().set(JAK.BrowserInfo.Processor.COOKIE_PREFIX + Bidemo.processor._id, null, { expires:Bidemo.processor._getCookieExpire() });
+			};
+
+			Bidemo.handleEvent = function(e) {
+				JAK.Events.cancelDef(e);
+				JAK.Events.stopEvent(e);
+				Bidemo.run();
+			};
+		</script>
+		
+		<title>BrowserInfo demo</title>
+	</head>
+
+	<body>
+		<div id="bibc"></div>
+		<div id="page">
+			<h1>BrowserInfo demo</h1>
+			<p>Widget zkontroluje verzi prohlížeče dle specifikace a pokud je nižší, zobrazí informační panel s nabídkou stáhnutí novějšího prohlížeče.</p>
+			<h2>Závislosti</h2>
+			<ul>
+				<li>JAK.Cookie</li>
+				<li>JAK.ModalWindow</li>
+			</ul>
+			<h2>Použití</h2>
+			<p>Je třeba vutvořit instanci <dfn>processoru</dfn>, speicifikovat cestu k obrázkům a nastavit odkazy na relevantní prohlížeče v různých <abbr title="Operační Systém">OS</abbr></p>
+			<div class="code"><pre><span class="nx">var processor</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JAK</span><span class="p">.</span><span class="nx">BrowserInfo</span><span class="p">.</span><span class="nx">Processor</span><span class="p">({</span> <span class="nx">imgPath</span><span class="o">:</span><span class="s2">"../img/"</span> <span class="p">});</span>
+<span class="nx">processor</span><span class="p">.</span><span class="nx">setLinks</span><span class="p">({</span>
+    <span class="nx">win</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">gecko</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">seznam</span><span class="o">:</span> <span class="s2">"http://download.seznam.cz/firefox/release/seznam-firefox-win32-cs.exe"</span><span class="p">,</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.mozilla.cz/stahnout/firefox/"</span>
+        <span class="p">},</span>
+        <span class="nx">chrome</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.google.cz/chrome/?hl=cs"</span>
+        <span class="p">},</span>
+        <span class="nx">opera</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">seznam</span><span class="o">:</span> <span class="s2">"http://download.seznam.cz/opera/Opera_1700_int_Setup.exe"</span><span class="p">,</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.opera.com/download/get/?partner=www&amp;opsys=Windows"</span>
+        <span class="p">},</span>
+        <span class="nx">ie64</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">seznam</span><span class="o">:</span> <span class="s2">"http://download.seznam.cz/ie/IE10-Setup-Seven64.exe"</span><span class="p">,</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"</span>
+        <span class="p">},</span>
+        <span class="nx">ie32</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">seznam</span><span class="o">:</span> <span class="s2">"http://download.seznam.cz/ie/IE10-Setup-Seven32.exe"</span><span class="p">,</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"</span>
+        <span class="p">},</span>
+        <span class="nx">ie</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">mac</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">gecko</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">seznam</span><span class="o">:</span> <span class="s2">"http://download.seznam.cz/firefox/release/seznam-firefox-mac-cs.dmg"</span><span class="p">,</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.mozilla.cz/stahnout/firefox/"</span>
+        <span class="p">},</span>
+        <span class="nx">chrome</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.google.cz/chrome/?hl=cs"</span>
+        <span class="p">},</span>
+        <span class="nx">opera</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.opera.com/download/get/?partner=www&amp;opsys=MacOS"</span>
+        <span class="p">},</span>
+        <span class="nx">safari</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.apple.com/safari/download/"</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">nix</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">gecko</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">seznam</span><span class="o">:</span> <span class="s2">"http://download.seznam.cz/firefox/release/seznam-firefox-linux-cs.bz2"</span><span class="p">,</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.mozilla.cz/stahnout/firefox/"</span>
+        <span class="p">},</span>
+        <span class="nx">chrome</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.google.cz/chrome/?hl=cs"</span>
+        <span class="p">},</span>
+        <span class="nx">opera</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">common</span><span class="o">:</span> <span class="s2">"http://www.opera.com/download/guide/?os=linux"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+			<p>Pak je třeba nastavit požadavky na prohlížeče, a to buď minimální:</p>
+			<div class="code"><pre><span class="nx">processor</span><span class="p">.</span><span class="nx">setMinimum</span><span class="p">(</span>
+    <span class="p">[</span>                   <span class="c1">// pole obsahujeci objekty, kde klicem je nazev prohlizece (jako v JAK.Browser.client) a hodnotou je pozadovana verze
+</span>        <span class="p">{</span> <span class="s2">"gecko"</span><span class="o">:</span><span class="mi">24</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">"opera"</span><span class="o">:</span><span class="mi">15</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">"ie"</span><span class="o">:</span><span class="mi">8</span> <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="nx">preText</span><span class="o">:</span> <span class="s2">"Ve Vašem prohlížeč web nebude fungovat. "</span><span class="p">,</span> <span class="c1">// text pred odkazem  \
+</span>    <span class="nx">linkText</span><span class="o">:</span> <span class="s2">"Stáhněte si"</span><span class="p">,</span>                             <span class="c1">// text odkazu         &gt; Zprava, ktera se zobrazi pokud prohlizec nesplnuje pozadavky
+</span>    <span class="nx">postText</span><span class="o">:</span> <span class="s2">" modernější."</span>                             <span class="c1">// text za odkazem    /
+</span><span class="p">);</span>
+</pre></div>
+			<p>nebo doporučené:</p>
+			<div class="code"><pre><span class="nx">processor</span><span class="p">.</span><span class="nx">setRecommended</span><span class="p">(</span>
+    <span class="p">[</span>                   <span class="c1">// pole obsahujeci objekty, kde klicem je nazev prohlizece (jako v JAK.Browser.client) a hodnotou je pozadovana verze
+</span>        <span class="p">{</span> <span class="s2">"gecko"</span><span class="o">:</span><span class="mi">26</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">"opera"</span><span class="o">:</span><span class="mi">19</span> <span class="p">},</span>
+        <span class="p">{</span> <span class="s2">"ie"</span><span class="o">:</span><span class="mi">10</span> <span class="p">},</span>
+    <span class="p">],</span>
+    <span class="nx">preText</span><span class="o">:</span> <span class="s2">"Ve Vašem prohlížeč web nebude fungovat. "</span><span class="p">,</span> <span class="c1">// text pred odkazem  \
+</span>    <span class="nx">linkText</span><span class="o">:</span> <span class="s2">"Stáhněte si"</span><span class="p">,</span>                             <span class="c1">// text odkazu         &gt; Zprava, ktera se zobrazi pokud prohlizec nesplnuje pozadavky
+</span>    <span class="nx">postText</span><span class="o">:</span> <span class="s2">" modernější."</span>                             <span class="c1">// text za odkazem    /
+</span><span class="p">);</span>
+</pre></div>
+			<p>A můžem spustit</p>
+			<div class="code"><pre><span class="nx">processor</span><span class="p">.</span><span class="nx">launch</span><span class="p">(</span><span class="nx">JAK</span><span class="p">.</span><span class="nx">gel</span><span class="p">(</span><span class="s2">"area"</span><span class="p">));</span> <span class="c1">// je treba specifikovat, kam se ma pripadne vlozit info panel
+</span></pre></div>
+
+			<h2>Ukázka</h2>
+			<form id="conf">
+				<fieldset id="clients">
+					<label>
+						<span>Firefox:</span>
+						<input id="gecko" name="gecko" type="text" value="25" />
+					</label>
+					<label>
+						<span>Chrome:</span>
+						<input id="chrome" name="chrome" type="text" value="31" />
+					</label>
+					<label>
+						<span>IE:</span>
+						<input id="ie" name="ie" type="text" value="10" />
+					</label>
+					<label>
+						<span>Safari:</span>
+						<input id="safari" name="safari" type="text" value="6" />
+					</label>
+					<label>
+						<span>Opera:</span>
+						<input id="opera" name="opera" type="text" value="13" />
+					</label>
+				</fieldset>
+
+				<fieldset id="texts">
+					<label>
+						<span>Text před odkazem:</span>
+						<input id="preText" name="preText" type="text" size="50" value="Váš prohlížeč je dost zastaralý. " />
+					</label>
+					<label>
+						<span>Text odkazu:</span>
+						<input id="linkText" name="linkText" type="text" size="50" value="Aktualizujte si ho" />
+					</label>
+					<label>
+						<span>Text za odkazem:</span>
+						<input id="postText" name="postText" type="text" size="50" value=", ať vám na webu vše funguje v pořádku" />
+					</label>
+				</fieldset>
+
+				<label>
+					<input type="submit" value="Spustit" />
+					<input id="result" type="text"  disabled="disabled" />
+				</label>
+			</form>
+			<script type="text/javascript">
+				JAK.Events.addListener(JAK.gel("conf"), "submit", Bidemo);
+			</script>
+
+			<div id="foot">jose 2014</div>
+		</div>
+	</body>
+</html>

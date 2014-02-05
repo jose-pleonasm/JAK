@@ -1,0 +1,33 @@
+.browserInfoBar												{ position: relative; width: 100%; line-height: 16px; font-size: 14px; background: #fffdf3; color: #000; border-bottom: 4px solid #ffa92d; overflow: hidden; }
+.browserInfoBar												{ height: 36px; transition: height 500ms; -webkit-transition: height 500ms; -moz-transition: height 500ms; -o-transition: height 500ms; -ms-transition: height 500ms; }
+.browserInfoBar .close										{ display: block; position: absolute; top: 9px; right: 10px; z-index: 1001; width: 16px; height: 16px; line-height: 16px; font-size: 12px; font-family: sans-serif; font-weight: bold; background: transparent; color: #f85f00; border-radius: 50%; cursor: pointer; text-align: center; }
+.browserInfoBar .barinner									{ padding: 10px 14px; }
+.browserInfoBar .msg										{ margin: 0; padding: 0; }
+.browserInfoBar a											{ color: #0000d1; }
+
+.mw-overlay													{ opacity: 0.7; }
+.mw-window.browserInfoWindow .mw-content					{ margin: 30px 39px 20px; width: 330px; }
+.biwContainer												{ margin: 0; width: 330px; font-size: 16px; color: #333; line-height: 1.5em; }
+.biwContainer h1											{ margin: 0 0 19px -5px; }
+.biwContainer h1 img										{ display: block; }
+.biwContainer h2											{ font-size: 16px; }
+.biwContainer .dlb											{ margin: 20px 0 0 25px; width: auto; overflow: hidden; }
+.biwContainer .dlb a										{ color: #fff; text-decoration: none; }
+.biwContainer .dlb-jigsaw									{ display: block; float: left; height: 69px; }
+.biwContainer .dlb-left										{ width: 60px; background: url(img/dlb-left.png) no-repeat scroll top left; }
+.biwContainer .dlb-middle									{ width: auto; max-width: 231px; background: url(img/dlb-middle.png) repeat-x scroll top center; }
+.biwContainer .dlb-right									{ width: 13px; background: url(img/dlb-right.png) no-repeat scroll top right; }
+.biwContainer .dlb-text										{ display: block; margin: 18px 10px 0 0; font-size: 15px; line-height: 1.1em; }
+.biwContainer .dlb-sup										{ display: block; margin: 0 0 0 1px; font-size: 12px; line-height: 1.3em; }
+.biwContainer .other										{ margin: 20px 0 0 0; }
+.biwContainer ul											{ display: block; list-style: none; margin: 2px 0 0 0; padding: 0; }
+.biwContainer li											{ display: block; float: left; margin: 0 0 10px 0; padding: 0; }
+.biwContainer li a											{ display: block; white-space: nowrap; overflow: ellipsis; color: #333; text-decoration: none; padding-right: 10px\0; }
+.biwContainer li:nth-of-type(odd) a							{ min-width: 170px; min-width: inherit\0; }
+.biwContainer li a .logo									{ display: block; float: left; width: 32px; height: 32px; background-position: top left; background-repeat: no-repeat; }
+.biwContainer li.ie a .logo									{ background-image: url(img/client-ie.png); }
+.biwContainer li.gecko a .logo								{ background-image: url(img/client-gecko.png); }
+.biwContainer li.chrome a .logo								{ background-image: url(img/client-chrome.png); }
+.biwContainer li.safari a .logo								{ background-image: url(img/client-safari.png); }
+.biwContainer li.opera a .logo								{ background-image: url(img/client-opera.png); }
+.biwContainer li a .text									{ display: block; float: left; margin: 4px 0 0 5px; }
