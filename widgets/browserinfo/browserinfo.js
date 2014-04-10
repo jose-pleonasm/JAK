@@ -2,12 +2,61 @@
 /**
  * @overview Kontrolovani verze prohlizece dle specifikace a pripadne zobrazeni informacniho panelu
  * @author jose
- */ 
- 
+ */
+
 /**
  * @namespace
  */
 JAK.BrowserInfo = { NAME:"JAK.BrowserInfo" };
+
+/**
+ * @see JAK.BrowserInfo.Processor#setLinks
+ * @type {Object}
+ */
+JAK.BrowserInfo.DEFAULT_LINKS = {
+	win: {
+		gecko: {
+			seznam: "http://download.seznam.cz/firefox/release/seznam-firefox-win32-cs.exe",
+			common: "http://www.mozilla.cz/stahnout/firefox/"
+		},
+		opera: {
+			seznam: "http://download.seznam.cz/opera/Opera_1700_int_Setup.exe",
+			common: "http://www.opera.com/download/get/?partner=www&opsys=Windows"
+		},
+		ie64: {
+			seznam: "http://download.seznam.cz/ie/IE10-Setup-Seven64.exe",
+			common: "http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"
+		},
+		ie32: {
+			seznam: "http://download.seznam.cz/ie/IE10-Setup-Seven32.exe",
+			common: "http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"
+		},
+		ie: {
+			common: "http://windows.microsoft.com/cs-cz/internet-explorer/download-ie"
+		}
+	},
+	mac: {
+		gecko: {
+			seznam: "http://download.seznam.cz/firefox/release/seznam-firefox-mac-cs.dmg",
+			common: "http://www.mozilla.cz/stahnout/firefox/"
+		},
+		opera: {
+			common: "http://www.opera.com/download/get/?partner=www&opsys=MacOS"
+		},
+		safari: {
+			common: "http://support.apple.com/downloads/#safari"
+		}
+	},
+	nix: {
+		gecko: {
+			seznam: "http://download.seznam.cz/firefox/release/seznam-firefox-linux-cs.bz2",
+			common: "http://www.mozilla.cz/stahnout/firefox/"
+		},
+		opera: {
+			common: "http://www.opera.com/download/guide/?os=linux"
+		}
+	}
+};
 
 /**
  * Vrati nazev OS
@@ -264,6 +313,7 @@ JAK.BrowserInfo.Bar.prototype._build = function() {
 	this._dom.barInner = JAK.cel("div", "barinner");
 	this._dom.bar.appendChild(this._dom.barInner);
 	this._dom.close = JAK.cel("span", "close");
+	this._dom.close.setAttribute("data-dot", "/close-browser-info-bar");
 	this._dom.bar.appendChild(this._dom.close);
 	if (this._options.closeImg) {
 		this._dom.closeImg = JAK.cel("img");
@@ -316,7 +366,7 @@ JAK.BrowserInfo.Window = JAK.ClassMaker.makeClass({
 	]
 });
 
-JAK.BrowserInfo.Window.MSG = "Váš prohlížeč je zastaralý a je možné, že nebude na tomto webu fungovat správně. Abyste si mohli užívat tento web bez omezení, doporučujeme prohlížeč aktualizovat.";
+JAK.BrowserInfo.Window.MSG = "Bohužel vaše verze webového prohlížeče není aktuální. Může se tak stát, že budete ochuzeni o některé funkcionality webu, které jsou v modernějších prohlížečích samozřejmostí.<br /> Abyste si mohli užívat prohlížení webu a jeho obsahu bez omezení, doporučujeme váš současný prohlížeč aktualizovat jedním z prohlížečů z nabídky níže.";
 
 /**
  * Vytvori okno
@@ -375,21 +425,29 @@ JAK.BrowserInfo.Window.prototype._build = function() {
 		var btnLeft = JAK.cel("span", "dlb-jigsaw dlb-left");
 		var btnMiddle = JAK.cel("span", "dlb-jigsaw dlb-middle");
 		var btnRight = JAK.cel("span", "dlb-jigsaw dlb-right");
+			var btnC1 = JAK.cel("span", "dlb-c1");
+				var btnC2 = JAK.cel("span", "dlb-c2");
+					var btnC3 = JAK.cel("span", "dlb-c3");
 		var btnTxt = JAK.cel("strong", "dlb-text");
 		var linkTxt = "Stáhnout " + JAK.BrowserInfo.getClientName(this._options.main.client);
 		if (this._options.main.links["seznam"]) {
 			btnA.href = this._options.main.links["seznam"];
 			linkTxt += " od&nbsp;Seznamu";
+		} else {
+			btnA.target = "_blank";
 		}
 		btnTxt.innerHTML = linkTxt;
 		var btnSup = JAK.cel("span", "dlb-sup");
 		btnSup.innerHTML = "Verze pro " + JAK.BrowserInfo.getPlatformName(this._options.platform);
 		btn.appendChild(btnA);
+		btnC3.appendChild(btnTxt);
+		btnC3.appendChild(btnSup);
+		btnC2.appendChild(btnC3);
+		btnC1.appendChild(btnC2);
+		btnMiddle.appendChild(btnC1);
 		btnA.appendChild(btnLeft);
 		btnA.appendChild(btnMiddle);
 		btnA.appendChild(btnRight);
-		btnMiddle.appendChild(btnTxt);
-		btnMiddle.appendChild(btnSup);
 		this._content.appendChild(btn);
 	}
 
@@ -402,17 +460,24 @@ JAK.BrowserInfo.Window.prototype._build = function() {
 	var oItemA = null;
 	var oItemLogo = null;
 	var oItemText = null;
+	var inx = 0;
 	for (var client in this._options.others) {
-		oItem = JAK.cel("li", client);
+		oItem = JAK.cel("li", client + " " + (inx % 2 ? "even" : "odd"));
 		oItemA = JAK.cel("a");
 		oItemLogo = JAK.cel("span", "logo");
 		oItemText = JAK.cel("span", "text");
 		oItemText.innerHTML = JAK.BrowserInfo.getClientName(client);
-		oItemA.href = this._options.others[client]["seznam"] ? this._options.others[client]["seznam"] : this._options.others[client]["common"];
+		if (this._options.others[client]["seznam"]) {
+			oItemA.href = this._options.others[client]["seznam"];
+		} else {
+			oItemA.href = this._options.others[client]["common"];
+			oItemA.target = "_blank";
+		}
 		oItemA.appendChild(oItemLogo);
 		oItemA.appendChild(oItemText);
 		oItem.appendChild(oItemA);
 		oMenu.appendChild(oItem);
+		inx++;
 	}
 	other.appendChild(oTitle);
 	other.appendChild(oMenu);
@@ -455,7 +520,7 @@ JAK.BrowserInfo.Processor.prototype.$constructor = function(options) {
 	this._exdays = options.exdays || 2;
 	this._minimum = null;
 	this._recommended = null;
-	this._links = null;
+	this._links = JAK.BrowserInfo.DEFAULT_LINKS[JAK.Browser.platform] || null;
 	this._bar = null;
 };
 
@@ -468,8 +533,11 @@ JAK.BrowserInfo.Processor.prototype.$constructor = function(options) {
  *                           }
  */
 JAK.BrowserInfo.Processor.prototype.setLinks = function(links) {
+	if (!links) {
+		throw new Error("Invalid argument: links must be specified");
+	}
 	var platformLinks = links[JAK.Browser.platform];
-	this._links = platformLinks ? platformLinks : null;
+	this._links = platformLinks || null;
 };
 
 /**
@@ -524,6 +592,11 @@ JAK.BrowserInfo.Processor.prototype.launch = function(barContainer) {
 		return;
 	}
 
+	if (!this._links) {
+		console.warn("[JAK.BrowserInfo.Processor] No links for platform '" + JAK.Browser.platform + "'");
+		return;
+	}
+
 	// zakladni atributy pro panel
 	var barOptions = {
 		container: barContainer,
@@ -540,10 +613,8 @@ JAK.BrowserInfo.Processor.prototype.launch = function(barContainer) {
 			barOptions.elmClass = "error";
 			barOptions.preText = this._minimum.preText;
 			barOptions.postText = this._minimum.postText;
-			if (this._links) {
-				barOptions.link = this._getCurrentLink();
-				barOptions.linkText = this._minimum.linkText;
-			}
+			barOptions.link = this._getCurrentLink();
+			barOptions.linkText = this._minimum.linkText;
 		}
 	}
 	if (minimumReady && this._recommended) {
@@ -552,10 +623,8 @@ JAK.BrowserInfo.Processor.prototype.launch = function(barContainer) {
 			barOptions.elmClass = "warn";
 			barOptions.preText = this._recommended.preText;
 			barOptions.postText = this._recommended.postText;
-			if (this._links) {
-				barOptions.link = this._getCurrentLink();
-				barOptions.linkText = this._recommended.linkText;
-			}
+			barOptions.link = this._getCurrentLink();
+			barOptions.linkText = this._recommended.linkText;
 		}
 	}
 
