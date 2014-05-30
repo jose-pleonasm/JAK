@@ -43,7 +43,8 @@ JAK.ImageCropper.prototype.$constructor = function(image, form, optObj) {
 	this.image.parentNode.replaceChild(this.container,this.image);
 	this.container.appendChild(this.image);
 
-	this.image.style.maxWidth = "800px";
+	this.container.style.maxWidth = "800px";
+	this.image.style.maxWidth = "100%";
 	
 	this.views = [];
 	this.viewIndex = 0;
