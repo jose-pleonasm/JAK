@@ -459,7 +459,7 @@ JAK.ImageCropper.View.prototype._adjust = function(dx,dy,dw,dh) {
 		if (dw && !fx) { this.nw = nw; }
 		if (dh && !fy) { this.nh = nh; }
 	}
-	this._updateDOM(this.nx / this.reduceRatio,this.ny / this.reduceRatio,this.nw / this.reduceRatio,this.nh / this.reduceRatio);
+	this._updateDOM(this.nx,this.ny,this.nw,this.nh);
 }
 
 JAK.ImageCropper.View.prototype._mouseup = function(e, elm) {
@@ -477,10 +477,10 @@ JAK.ImageCropper.View.prototype._mousemove = function(e, elm) {
 	var dx = e.clientX - this.mx;
 	var dy = e.clientY - this.my;
 	switch (this.action) {
-		case "move": this._adjust(dx,dy,0,0); break;
-		case "resize-e": this._adjust(0,0,dx,0); break;
-		case "resize-s": this._adjust(0,0,0,dy); break;
-		case "resize": this._adjust(0,0,dx,dy); break;
+		case "move": this._adjust(dx / this.reduceRatio,dy / this.reduceRatio,0,0); break;
+		case "resize-e": this._adjust(0,0,dx / this.reduceRatio,0); break;
+		case "resize-s": this._adjust(0,0,0,dy / this.reduceRatio); break;
+		case "resize": this._adjust(0,0,dx / this.reduceRatio,dy / this.reduceRatio); break;
 	}
 }
 
