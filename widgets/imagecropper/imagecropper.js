@@ -42,6 +42,8 @@ JAK.ImageCropper.prototype.$constructor = function(image, form, optObj) {
 	this.container = JAK.mel("div", null, {backgroundColor:"#000",position:"relative"});
 	this.image.parentNode.replaceChild(this.container,this.image);
 	this.container.appendChild(this.image);
+
+	this.image.style.maxWidth = "800px";
 	
 	this.views = [];
 	this.viewIndex = 0;
@@ -51,6 +53,7 @@ JAK.ImageCropper.prototype.$constructor = function(image, form, optObj) {
 	this.image.style.opacity = 0.3;
 	this.image.style.KHTMLOpacity = 0.3;
 	this.image.style.filter = "alpha(opacity=30)";
+	this.reduceRatio = 1;
 	
 	this.ec.push(JAK.Events.addListener(document,"mouseup",this,"_mouseup",false,true));
 	this.ec.push(JAK.Events.addListener(document,"mousemove",this,"_mousemove",false,true));
@@ -100,7 +103,7 @@ JAK.ImageCropper.prototype._findView = function(view) {
  */
 JAK.ImageCropper.prototype.createView = function(name, dimensions, fixedAspect, color) {
 	this.viewIndex++;
-	var view = new JAK.ImageCropper.View(this, this.viewIndex, name, dimensions, fixedAspect, color);
+	var view = new JAK.ImageCropper.View(this, this.viewIndex, name, dimensions, fixedAspect, color, this.reduceRatio);
 	this.views.push(view);
 	return view;
 }
@@ -213,7 +216,7 @@ JAK.ImageCropper.View = JAK.ClassMaker.makeClass({
 	IMPLEMENT:JAK.ISignals
 });
 
-JAK.ImageCropper.View.prototype.$constructor = function(owner, index, name, dimensions, fixedAspect, color) {
+JAK.ImageCropper.View.prototype.$constructor = function(owner, index, name, dimensions, fixedAspect, color, reduceRatio) {
 	this.owner = owner;
 	this.index = index;
 	this.name = name;
@@ -222,6 +225,7 @@ JAK.ImageCropper.View.prototype.$constructor = function(owner, index, name, dime
 	this.visible = false;
 	this.action = false;
 	this.color = color || "#fff";
+	this.reduceRatio = reduceRatio || 1;
 	
 	var x = dimensions.x;
 	var y = dimensions.y;
@@ -375,11 +379,11 @@ JAK.ImageCropper.View.prototype._move = function(x,y) {
 }
 
 JAK.ImageCropper.View.prototype._updateDOM = function(l,t,w,h) {
-	this.container.style.left = Math.round(l) + "px";
-	this.container.style.top = Math.round(t) + "px";
-	this.container.style.width = Math.round(w-2) + "px";
-	this.container.style.height = Math.round(h-2) + "px";
-	this.container.style.backgroundPosition = Math.round(-l-1) + "px " + Math.round(-t-1) + "px";
+	this.container.style.left = Math.round(l * this.reduceRatio) + "px";
+	this.container.style.top = Math.round(t * this.reduceRatio) + "px";
+	this.container.style.width = Math.round((w-2) * this.reduceRatio) + "px";
+	this.container.style.height = Math.round((h-2) * this.reduceRatio) + "px";
+	this.container.style.backgroundPosition = Math.round((-l-1) * this.reduceRatio) + "px " + Math.round((-t-1) * this.reduceRatio) + "px";
 	if (this.owner.options.dimensions) {
 		this.dims.innerHTML = Math.round(w) + "&times;" + Math.round(h);
 	}
@@ -454,7 +458,7 @@ JAK.ImageCropper.View.prototype._adjust = function(dx,dy,dw,dh) {
 		if (dw && !fx) { this.nw = nw; }
 		if (dh && !fy) { this.nh = nh; }
 	}
-	this._updateDOM(this.nx,this.ny,this.nw,this.nh);
+	this._updateDOM(this.nx / this.reduceRatio,this.ny / this.reduceRatio,this.nw / this.reduceRatio,this.nh / this.reduceRatio);
 }
 
 JAK.ImageCropper.View.prototype._mouseup = function(e, elm) {
