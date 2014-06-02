@@ -5,8 +5,8 @@
 
 /**
  * @overview image cropper
- * @version 2.0
- * @author zara
+ * @version 3.0
+ * @author zara, jose
 */   
 
 /**
@@ -15,7 +15,7 @@
  */
 JAK.ImageCropper = JAK.ClassMaker.makeClass({
 	NAME: "JAK.ImageCropper",
-	VERSION: "2.0"
+	VERSION: "3.0"
 });
 
 /**
@@ -25,15 +25,18 @@ JAK.ImageCropper = JAK.ClassMaker.makeClass({
  * @param {string} [optObj.imagePath="img/"] cesta k obrazkum s lomitkem na konci
  * @param {bool} [optObj.dimensions=true] maji-li se ukazovat u kazdeho vyrezu rozmery
  * @param {int} [optObj.zIndex=100] zakladni z-index pro vyrezy
+ * @param {int} [optObj.maxWidth=0] maximalni sirka obrazku (pokud je obrazek vetsi, zmensi jej a vsechny veliceny prepocitava v odpovidajicim pomeru), 0 = nic nezmensuje
  */
 JAK.ImageCropper.prototype.$constructor = function(image, form, optObj) {
 	this.options = {
 		imagePath:"img/",
 		dimensions:true,
-		zIndex:100
+		zIndex:100,
+		maxWidth: 0
 	}
 	for (var p in optObj) { this.options[p] = optObj[p]; }
-	
+
+	this.ready = new JAK.Promise();
 	this.ec = [];
 	this.active = false; /* active view */
 	this.image = JAK.gel(image);
@@ -42,20 +45,24 @@ JAK.ImageCropper.prototype.$constructor = function(image, form, optObj) {
 	this.container = JAK.mel("div", null, {backgroundColor:"#000",position:"relative"});
 	this.image.parentNode.replaceChild(this.container,this.image);
 	this.container.appendChild(this.image);
-
-	this.container.style.maxWidth = "800px";
-	this.image.style.maxWidth = "100%";
 	
 	this.views = [];
 	this.viewIndex = 0;
 	
+	this.reduceRatio = 1;
 	this.iw = this.image.width || 0;
 	this.ih = this.image.height || 0;
 	this.image.style.opacity = 0.3;
 	this.image.style.KHTMLOpacity = 0.3;
 	this.image.style.filter = "alpha(opacity=30)";
-	this.reduceRatio = 1;
 	
+	if (this.options.maxWidth) {
+		this.reduceRatio = this.options.maxWidth/this.iw;
+
+		this.container.style.maxWidth = this.options.maxWidth + "px";
+		this.image.style.maxWidth = "100%";
+	}
+
 	this.ec.push(JAK.Events.addListener(document,"mouseup",this,"_mouseup",false,true));
 	this.ec.push(JAK.Events.addListener(document,"mousemove",this,"_mousemove",false,true));
 	
@@ -64,6 +71,10 @@ JAK.ImageCropper.prototype.$constructor = function(image, form, optObj) {
 	this.container.style.height = this.ih+"px";
 	
 	if (JAK.Browser.client == "ie" && JAK.Browser.version == 6) { document.execCommand("BackgroundImageCache", false, true); };
+
+	if (this.image.complete) {
+		this.ready.fulfill();
+	}
 }
 
 JAK.ImageCropper.prototype.$destructor = function() {
@@ -81,6 +92,15 @@ JAK.ImageCropper.prototype._load = function() {
 	this.ih = this.image.height;
 	this.container.style.width = this.iw+"px";
 	this.container.style.height = this.ih+"px";
+
+	if (typeof(this.image.naturalWidth) == "undefined") {
+		console.warn("[JAK.ImageCropper] Unsupported browser");
+		var relWidth = this.iw;
+	} else {
+		var relWidth = this.image.naturalWidth;
+	}
+	this.reduceRatio = this.options.maxWidth/relWidth;
+	this.ready.fulfill();
 }
 
 JAK.ImageCropper.prototype._findView = function(view) {
