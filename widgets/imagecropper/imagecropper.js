@@ -298,6 +298,7 @@ JAK.ImageCropper.View.prototype._build = function() {
 	this.container = JAK.mel("div", null, {position:"absolute",borderStyle:"solid",borderWidth:"1px",borderColor:this.color,cursor:"move"});
 	this.container.style.zIndex = this.owner.options.zIndex+this.index;
 	this.container.style.backgroundImage = "url("+this.owner.image.src+")";
+	this.container.style.backgroundSize = this.owner.iw + "px " + this.owner.ih + "px";
 	this.container.style.backgroundRepeat = "no-repeat";
 
 	var s = {
@@ -384,7 +385,7 @@ JAK.ImageCropper.View.prototype._updateDOM = function(l,t,w,h) {
 	this.container.style.top = Math.round(t * this.reduceRatio) + "px";
 	this.container.style.width = Math.round((w-2) * this.reduceRatio) + "px";
 	this.container.style.height = Math.round((h-2) * this.reduceRatio) + "px";
-	this.container.style.backgroundPosition = Math.round((-l-1) * this.reduceRatio) + "px " + Math.round((-t-1) * this.reduceRatio) + "px";
+	this.container.style.backgroundPosition = Math.round((-l * this.reduceRatio)-1) + "px " + Math.round((-t * this.reduceRatio)-1) + "px";
 	if (this.owner.options.dimensions) {
 		this.dims.innerHTML = Math.round(w) + "&times;" + Math.round(h);
 	}
