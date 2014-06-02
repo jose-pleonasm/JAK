@@ -404,8 +404,8 @@ JAK.ImageCropper.View.prototype.getCoordinates = function() {
 }
 
 JAK.ImageCropper.View.prototype._adjust = function(dx,dy,dw,dh) {
-	var iw = this.owner.iw;
-	var ih = this.owner.ih;
+	var iw = this.owner.iw / this.reduceRatio;
+	var ih = this.owner.ih / this.reduceRatio;
 	if (dx) { /* kontrola posunu x */
 		if (this.x + dx < 0) { dx = -this.x; }
 		if (this.x + this.w - 1 + dx > iw) { dx = iw - this.x - this.w; }
@@ -474,13 +474,13 @@ JAK.ImageCropper.View.prototype._mouseup = function(e, elm) {
 }
 
 JAK.ImageCropper.View.prototype._mousemove = function(e, elm) {
-	var dx = e.clientX - this.mx;
-	var dy = e.clientY - this.my;
+	var dx = (e.clientX - this.mx) / this.reduceRatio;
+	var dy = (e.clientY - this.my) / this.reduceRatio;
 	switch (this.action) {
-		case "move": this._adjust(dx / this.reduceRatio,dy / this.reduceRatio,0,0); break;
-		case "resize-e": this._adjust(0,0,dx / this.reduceRatio,0); break;
-		case "resize-s": this._adjust(0,0,0,dy / this.reduceRatio); break;
-		case "resize": this._adjust(0,0,dx / this.reduceRatio,dy / this.reduceRatio); break;
+		case "move": this._adjust(dx,dy,0,0); break;
+		case "resize-e": this._adjust(0,0,dx,0); break;
+		case "resize-s": this._adjust(0,0,0,dy); break;
+		case "resize": this._adjust(0,0,dx,dy); break;
 	}
 }
 
