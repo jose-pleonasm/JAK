@@ -5,8 +5,8 @@
 
 /**
  * @overview image cropper
- * @version 2.0
- * @author zara
+ * @version 2.1
+ * @author zara, jose
 */   
 
 /**
@@ -15,7 +15,7 @@
  */
 JAK.ImageCropper = JAK.ClassMaker.makeClass({
 	NAME: "JAK.ImageCropper",
-	VERSION: "2.0"
+	VERSION: "2.1"
 });
 
 /**
@@ -25,12 +25,14 @@ JAK.ImageCropper = JAK.ClassMaker.makeClass({
  * @param {string} [optObj.imagePath="img/"] cesta k obrazkum s lomitkem na konci
  * @param {bool} [optObj.dimensions=true] maji-li se ukazovat u kazdeho vyrezu rozmery
  * @param {int} [optObj.zIndex=100] zakladni z-index pro vyrezy
+ * @param {int} [optObj.reduceRatio=1] pomer v jakem se maji vyrezy zobrazovat (pokud je obrazek pro imagecropper mensi nez ten, ktery se bude realne orezavat), pomer = sirka nahledu / realna sirka obrazku
  */
 JAK.ImageCropper.prototype.$constructor = function(image, form, optObj) {
 	this.options = {
 		imagePath:"img/",
 		dimensions:true,
-		zIndex:100
+		zIndex:100,
+		reduceRatio: 0
 	}
 	for (var p in optObj) { this.options[p] = optObj[p]; }
 	
@@ -100,7 +102,7 @@ JAK.ImageCropper.prototype._findView = function(view) {
  */
 JAK.ImageCropper.prototype.createView = function(name, dimensions, fixedAspect, color) {
 	this.viewIndex++;
-	var view = new JAK.ImageCropper.View(this, this.viewIndex, name, dimensions, fixedAspect, color);
+	var view = new JAK.ImageCropper.View(this, this.viewIndex, name, dimensions, fixedAspect, color, this.options.reduceRatio);
 	this.views.push(view);
 	return view;
 }
@@ -208,12 +210,12 @@ JAK.ImageCropper.prototype._mousemove = function(e, elm) {
  */
 JAK.ImageCropper.View = JAK.ClassMaker.makeClass({
 	NAME:"View",
-	VERSION:"1.0",
+	VERSION:"1.1",
 	CLASS:"class",
 	IMPLEMENT:JAK.ISignals
 });
 
-JAK.ImageCropper.View.prototype.$constructor = function(owner, index, name, dimensions, fixedAspect, color) {
+JAK.ImageCropper.View.prototype.$constructor = function(owner, index, name, dimensions, fixedAspect, color, reduceRatio) {
 	this.owner = owner;
 	this.index = index;
 	this.name = name;
@@ -222,6 +224,7 @@ JAK.ImageCropper.View.prototype.$constructor = function(owner, index, name, dime
 	this.visible = false;
 	this.action = false;
 	this.color = color || "#fff";
+	this.reduceRatio = reduceRatio || 1;
 	
 	var x = dimensions.x;
 	var y = dimensions.y;
@@ -293,6 +296,7 @@ JAK.ImageCropper.View.prototype._build = function() {
 	this.container = JAK.mel("div", null, {position:"absolute",borderStyle:"solid",borderWidth:"1px",borderColor:this.color,cursor:"move"});
 	this.container.style.zIndex = this.owner.options.zIndex+this.index;
 	this.container.style.backgroundImage = "url("+this.owner.image.src+")";
+	this.container.style.backgroundSize = this.owner.iw + "px " + this.owner.ih + "px";
 	this.container.style.backgroundRepeat = "no-repeat";
 
 	var s = {
@@ -375,11 +379,11 @@ JAK.ImageCropper.View.prototype._move = function(x,y) {
 }
 
 JAK.ImageCropper.View.prototype._updateDOM = function(l,t,w,h) {
-	this.container.style.left = Math.round(l) + "px";
-	this.container.style.top = Math.round(t) + "px";
-	this.container.style.width = Math.round(w-2) + "px";
-	this.container.style.height = Math.round(h-2) + "px";
-	this.container.style.backgroundPosition = Math.round(-l-1) + "px " + Math.round(-t-1) + "px";
+	this.container.style.left = Math.round(l * this.reduceRatio) + "px";
+	this.container.style.top = Math.round(t * this.reduceRatio) + "px";
+	this.container.style.width = Math.round((w-2) * this.reduceRatio) + "px";
+	this.container.style.height = Math.round((h-2) * this.reduceRatio) + "px";
+	this.container.style.backgroundPosition = Math.round((-l * this.reduceRatio)-1) + "px " + Math.round((-t * this.reduceRatio)-1) + "px";
 	if (this.owner.options.dimensions) {
 		this.dims.innerHTML = Math.round(w) + "&times;" + Math.round(h);
 	}
@@ -399,8 +403,8 @@ JAK.ImageCropper.View.prototype.getCoordinates = function() {
 }
 
 JAK.ImageCropper.View.prototype._adjust = function(dx,dy,dw,dh) {
-	var iw = this.owner.iw;
-	var ih = this.owner.ih;
+	var iw = this.owner.iw / this.reduceRatio;
+	var ih = this.owner.ih / this.reduceRatio;
 	if (dx) { /* kontrola posunu x */
 		if (this.x + dx < 0) { dx = -this.x; }
 		if (this.x + this.w - 1 + dx > iw) { dx = iw - this.x - this.w; }
@@ -469,8 +473,8 @@ JAK.ImageCropper.View.prototype._mouseup = function(e, elm) {
 }
 
 JAK.ImageCropper.View.prototype._mousemove = function(e, elm) {
-	var dx = e.clientX - this.mx;
-	var dy = e.clientY - this.my;
+	var dx = (e.clientX - this.mx) / this.reduceRatio;
+	var dy = (e.clientY - this.my) / this.reduceRatio;
 	switch (this.action) {
 		case "move": this._adjust(dx,dy,0,0); break;
 		case "resize-e": this._adjust(0,0,dx,0); break;
