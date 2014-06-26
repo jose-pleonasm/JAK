@@ -45,13 +45,7 @@ JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLo
 		throw new Error("[JAS.StateManager] Invalid argument: stateUrl must be specified");
 	}
 
-	var isHistoryChange = false;
-	if (applyHistory && !this._history.isEmpty() && this._history.exists(stateUrl)) {
-		var tmp = this._history.get(stateUrl);
-		stateId = tmp.stateId;
-		params = tmp.params;
-		isHistoryChange = true;
-	}
+	var isHistoryChange = applyHistory && !this._history.isEmpty() && this._history.exists(stateUrl);
 	var newStateCtrl = null;
 	for (var i = 0, len = this._controllers.length; i < len; i++) {
 		if (stateId === this._controllers[i].getId()) {
@@ -80,7 +74,7 @@ JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLo
 	if (isHistoryChange) {
 		this._history.moveTo(stateUrl);
 	} else {
-		this._history.push(stateId, params, stateUrl, updateLocation);
+		this._history.push(stateUrl, { stateId:stateId, params:params, updateLocation:updateLocation });
 	}
 };
 

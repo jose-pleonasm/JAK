@@ -10,12 +10,10 @@ JAS.StateHistory.prototype.$constructor = function() {
 	this._pointer = -1;
 };
 
-JAS.StateHistory.prototype.push = function(stateId, params, stateUrl, updateLocation) {
+JAS.StateHistory.prototype.push = function(stateUrl, data) {
 	this._stack.push({
-		stateId: stateId,
-		params: params,
 		stateUrlStack: [stateUrl],
-		updateLocation: updateLocation
+		data: data || null
 	});
 	this._pointer++;
 };

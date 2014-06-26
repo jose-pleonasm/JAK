@@ -6,20 +6,6 @@ JAS.Router = JAK.ClassMaker.makeClass({
 	IMPLEMENT: [JAK.ISignals]
 });
 
-JAS.Router.route = function(rule, stateId, defaultParams) {
-	if (!rule) {
-		throw new Error("[JAS.Router] Invalid argument: rule must be specified");
-	}
-	if (!stateId) {
-		throw new Error("[JAS.Router] Invalid argument: stateId must be specified");
-	}
-	return {
-		rule: rule,
-		stateId: stateId,
-		defaultParams: defaultParams || null
-	};
-};
-
 JAS.Router.prototype.$constructor = function(locationMiddleman, stateManager, routeList) {
 	if (!locationMiddleman) {
 		throw new Error("[JAS.Router] Invalid argument: locationMiddleman must be specified");
@@ -27,9 +13,24 @@ JAS.Router.prototype.$constructor = function(locationMiddleman, stateManager, ro
 	if (!stateManager) {
 		throw new Error("[JAS.Router] Invalid argument: stateManager must be specified");
 	}
+	if (!routeList) {
+		throw new Error("[JAS.Router] Invalid argument: routeList must be specified");
+	}
+	if (!Array.isArray(routeList)) {
+		throw new Error("[JAS.Router] Invalid argument: routeList must be array");
+	}
 	this._location = locationMiddleman;
 	this._stateMgr = stateManager;
-	this._routeList = routeList;
+	this._routeList = [];
+
+	var route = null;
+	for (var i = 0, len = routeList.length; i < len; i++) {
+		route = routeList[i];
+		if (!route.rule || !route.stateId) {
+			throw new Error("[JAS.Router] Invalid argument: invalid route: " + JSON.stringify(route));
+		}
+		this._routeList.push(route);
+	}
 
 	this.process(this._location.get());
 	this.addListener("history-change", "_handleUrlChange", this._location);
