@@ -28,6 +28,15 @@ JAS.AStateController.prototype.getId = function() {
 };
 
 /**
+ * Zda je zmena stavu povolena
+ *
+ * @returns {boolean}
+ */
+JAS.AStateController.prototype.isChangeApproved = function() {
+	return true;
+};
+
+/**
  * Aktivuje stav
  *
  * @param   {object} params parametry stavu

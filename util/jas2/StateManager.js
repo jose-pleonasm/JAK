@@ -8,7 +8,7 @@ JAS.StateManager = JAK.ClassMaker.makeSingleton({
 JAS.StateManager.prototype.$constructor = function() {
 	this._controllers = null;
 	this._location = null;
-	this._stack = null;
+	this._history = null;
 
 	this._activeStateCtrl = null;
 };
@@ -23,16 +23,18 @@ JAS.StateManager.prototype.configure = function(configuration) {
 	if (!configuration.locationMiddleman) {
 		throw new Error("[JAS.StateManager] Invalid argument: locationMiddleman must be specified");
 	}
-	if (!configuration.stateStack) {
-		throw new Error("[JAS.StateManager] Invalid argument: stateStack must be specified");
+	if (!configuration.stateHistory) {
+		throw new Error("[JAS.StateManager] Invalid argument: stateHistory must be specified");
 	}
 
 	this._controllers = configuration.controllers;
 	this._location = configuration.locationMiddleman;
-	this._stack = configuration.stateStack;
+	this._history = configuration.stateHistory;
 };
 
-JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLocation) {
+JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLocation, applyHistory) {
+	updateLocation = typeof updateLocation !== "undefined" ? !!updateLocation : true;
+	applyHistory = !!applyHistory;
 	if (!this._controllers) {
 		throw new Error("[JAS.StateManager] Invalid state: StateManager is not configured");
 	}
@@ -43,6 +45,13 @@ JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLo
 		throw new Error("[JAS.StateManager] Invalid argument: stateUrl must be specified");
 	}
 
+	var isHistoryChange = false;
+	if (applyHistory && !this._history.isEmpty() && this._history.exists(stateUrl)) {
+		var tmp = this._history.get(stateUrl);
+		stateId = tmp.stateId;
+		params = tmp.params;
+		isHistoryChange = true;
+	}
 	var newStateCtrl = null;
 	for (var i = 0, len = this._controllers.length; i < len; i++) {
 		if (stateId === this._controllers[i].getId()) {
@@ -53,7 +62,7 @@ JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLo
 	if (this._activeStateCtrl && !this._activeStateCtrl.isChangeApproved()) {
 		return;
 	}
-	if (newStateCtrl != this._activeStateCtrl) {
+	if (this._activeStateCtrl && newStateCtrl != this._activeStateCtrl) {
 		this._activeStateCtrl.deactivate(newStateCtrl);
 	}
 	this._activeStateCtrl = null;
@@ -63,13 +72,16 @@ JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLo
 	} else {
 		console.warn("There isn't state controller for stateId „" + stateId + "“");
 	}
-	//TODO: change state
 
 	if (updateLocation) {
 		this._location.save(stateUrl);
 	}
 
-	this._stack.push(stateId, params, stateUrl, updateLocation);
+	if (isHistoryChange) {
+		this._history.moveTo(stateUrl);
+	} else {
+		this._history.push(stateId, params, stateUrl, updateLocation);
+	}
 };
 
 JAS.StateManager.prototype.updateLocation = function(stateUrl) {
@@ -79,5 +91,5 @@ JAS.StateManager.prototype.updateLocation = function(stateUrl) {
 
 	this._location.save(stateUrl);
 
-	this._stack.updateCurrentLocation(stateUrl);
+	this._history.updateCurrentLocation(stateUrl);
 };
