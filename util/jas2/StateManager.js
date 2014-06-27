@@ -45,7 +45,15 @@ JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLo
 		throw new Error("[JAS.StateManager] Invalid argument: stateUrl must be specified");
 	}
 
-	var isHistoryChange = applyHistory && !this._history.isEmpty() && this._history.exists(stateUrl);
+	var isHistoryChange = false;
+	if (applyHistory && !this._history.isEmpty() && this._history.exists(stateUrl)) {
+		if (this._history.isUnique(stateUrl)) {
+			var tmp = this._history.get(stateUrl);
+			stateId = tmp.stateId;
+			params = tmp.params;
+		}
+		isHistoryChange = true;
+	}
 	var newStateCtrl = null;
 	for (var i = 0, len = this._controllers.length; i < len; i++) {
 		if (stateId === this._controllers[i].getId()) {

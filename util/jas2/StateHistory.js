@@ -11,6 +11,10 @@ JAS.StateHistory.prototype.$constructor = function() {
 };
 
 JAS.StateHistory.prototype.push = function(stateUrl, data) {
+	if (!stateUrl) {
+		throw new Error("[JAS.StateHistory] Invalid argument: stateUrl must be specified");
+	}
+
 	this._stack.push({
 		stateUrlStack: [stateUrl],
 		data: data || null
@@ -19,6 +23,9 @@ JAS.StateHistory.prototype.push = function(stateUrl, data) {
 };
 
 JAS.StateHistory.prototype.updateCurrentLocation = function(stateUrl) {
+	if (!stateUrl) {
+		throw new Error("[JAS.StateHistory] Invalid argument: stateUrl must be specified");
+	}
 	if (!this._stack.length) {
 		throw new Error("[JAS.StateHistory] Invalid state: There is no state yet");
 	}
@@ -31,6 +38,9 @@ JAS.StateHistory.prototype.isEmpty = function() {
 };
 
 JAS.StateHistory.prototype.exists = function(stateUrl) {
+	if (!stateUrl) {
+		throw new Error("[JAS.StateHistory] Invalid argument: stateUrl must be specified");
+	}
 	if (!this._stack.length) {
 		throw new Error("[JAS.StateHistory] Invalid state: There is no state yet");
 	}
@@ -38,15 +48,30 @@ JAS.StateHistory.prototype.exists = function(stateUrl) {
 	return this._getPointer(stateUrl) > -1;
 };
 
-JAS.StateHistory.prototype.current = function() {
-	if (!this._stack.length) {
-		throw new Error("[JAS.StateHistory] Invalid state: There is no state yet");
+JAS.StateHistory.prototype.isUnique = function(stateUrl) {
+	if (!stateUrl) {
+		throw new Error("[JAS.StateHistory] Invalid argument: stateUrl must be specified");
 	}
 
-	return this._stack[this._pointer];
+	var alreadyFind = false;
+	for (var i = this._stack.length - 1; i > -1; i--) {
+		if (this._stack[i].stateUrlStack.indexOf(stateUrl) > -1) {
+			if (alreadyFind) {
+				return false;
+			}
+			alreadyFind = true;
+		}
+	}
+	if (!alreadyFind) {
+		throw new Error("[JAS.StateHistory] Argument out of range: There is no state for „" + stateUrl + "“");
+	}
+	return true;
 };
 
 JAS.StateHistory.prototype.get = function(stateUrl) {
+	if (!stateUrl) {
+		throw new Error("[JAS.StateHistory] Invalid argument: stateUrl must be specified");
+	}
 	if (!this._stack.length) {
 		throw new Error("[JAS.StateHistory] Invalid state: There is no state yet");
 	}
@@ -55,10 +80,13 @@ JAS.StateHistory.prototype.get = function(stateUrl) {
 		throw new Error("[JAS.StateHistory] Argument out of range: There is no state for „" + stateUrl + "“");
 	}
 
-	return this._stack[pointer];
+	return this._stack[pointer].data;
 };
 
 JAS.StateHistory.prototype.moveTo = function(stateUrl) {
+	if (!stateUrl) {
+		throw new Error("[JAS.StateHistory] Invalid argument: stateUrl must be specified");
+	}
 	if (!this._stack.length) {
 		throw new Error("[JAS.StateHistory] Invalid state: There is no state yet");
 	}
@@ -70,8 +98,21 @@ JAS.StateHistory.prototype.moveTo = function(stateUrl) {
 	this._pointer = newPointer;
 };
 
+JAS.StateHistory.prototype.current = function() {
+	if (!this._stack.length) {
+		throw new Error("[JAS.StateHistory] Invalid state: There is no state yet");
+	}
+
+	return this._stack[this._pointer].data;
+};
+
 JAS.StateHistory.prototype._getPointer = function(stateUrl) {
-	for (var i = 0, len = this._stack.length; i < len; i++) {
+	for (var i = this._pointer; i > -1; i--) {
+		if (this._stack[i].stateUrlStack.indexOf(stateUrl) > -1) {
+			return i;
+		}
+	}
+	for (var i = this._pointer, len = this._stack.length; i < len; i++) {
 		if (this._stack[i].stateUrlStack.indexOf(stateUrl) > -1) {
 			return i;
 		}
