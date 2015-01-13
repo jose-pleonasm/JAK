@@ -1,13 +1,15 @@
 "use strict";
 
 /**
- * @overview <em>Abstraktni trida</em> pro stavy, s nimiz bude pracovat StateManager
  * @author Jose
+ * @overview <em>Abstraktní třída</em> pro kontrolery stavu, s nimiž bude pracovat StateManager
  */
 
 /**
- * @class Abstraktni trida stavu
- * @group jas
+ * <em>Abstraktní třída</em> pro kontrolery stavu, s nimiž bude pracovat StateManager
+ *
+ * @memberof JAS
+ * @class AStateController
  */
 JAS.AStateController = JAK.ClassMaker.makeClass({
 	NAME: "AStateController",
@@ -19,38 +21,36 @@ JAS.AStateController.prototype.$constructor = function() {
 };
 
 /**
- * Vrati ID stavu, ktery obstarava tento stav
+ * Vratí ID stavu, který obstarává tento kontroler
  *
- * @returns {string} ID stavu
+ * @return {string} ID stavu
  */
 JAS.AStateController.prototype.getId = function() {
 	return this._id;
 };
 
 /**
- * Zda je zmena stavu povolena
+ * Zda je změna stavu povolena
  *
- * @returns {boolean}
+ * @return {boolean}
  */
 JAS.AStateController.prototype.isChangeApproved = function() {
 	return true;
 };
 
 /**
- * Aktivuje stav
+ * Aktivuje kontroler
  *
- * @param   {object} params parametry stavu
+ * @param {object} params parametry stavu
  */
 JAS.AStateController.prototype.activate = function(params) {
 	throw new Error("Not implemented");
 };
 
 /**
- * Deaktivuje stav
+ * Deaktivuje kontroler
  *
- * Parametrem je predana instance stavu, ktery bude nasledne aktivovan
- *
- * @param   {JAS.AStateController} newState
+ * @param {JAS.AStateController} newState instance kontroleru, který bude následně aktivován
  */
 JAS.AStateController.prototype.deactivate = function(newState) {
 	throw new Error("Not implemented");
