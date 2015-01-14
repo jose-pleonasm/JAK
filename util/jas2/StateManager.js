@@ -1,10 +1,22 @@
 "use strict";
 
+/**
+ * @author Jose
+ * @overview Implementace StateManager.
+ */
+
+/**
+ * Správce stavu aplikace. Přepíná mezi jednotlivými stavy.
+ *
+ * @memberof JAS
+ * @class StateManager
+ */
 JAS.StateManager = JAK.ClassMaker.makeSingleton({
 	NAME: "StateManager",
 	VERSION: "1.0"
 });
 
+/* @constructs */
 JAS.StateManager.prototype.$constructor = function() {
 	this._controllers = null;
 	this._location = null;
@@ -13,6 +25,11 @@ JAS.StateManager.prototype.$constructor = function() {
 	this._activeStateCtrl = null;
 };
 
+/**
+ * Nakonfiguruje správce.
+ *
+ * @param  {Object} configuration Konfigurační objekt.
+ */
 JAS.StateManager.prototype.configure = function(configuration) {
 	if (!configuration.controllers) {
 		throw new Error("[JAS.StateManager] Invalid argument: controllers must be specified");

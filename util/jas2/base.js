@@ -2,6 +2,7 @@
 
 /**
  * @author Jose
+ * @overview Deklarace jmenného prostoru, obecné funkce.
  */
 
 /**
@@ -14,12 +15,11 @@ var JAS = {
 };
 
 /**
- * Spustí JAS ve standardní konfiguraci
+ * Spustí JAS ve standardní konfiguraci.
  *
  * @memberof JAS
- * @function stdRun
- * @param {Object[]} controllers pole vlastních kontrolerů stavu
- * @param {Object[]} routeList routovací argumenty
+ * @param  {Object[]} controllers Pole vlastních kontrolerů stavu (viz. {@link JAS.AStateController}).
+ * @param  {Object[]} routeList Routovací argumenty.
  */
 JAS.stdRun = function(controllers, routeList) {
 	JAK.Events.onDomReady(window, function() {

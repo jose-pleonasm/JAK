@@ -2,11 +2,11 @@
 
 /**
  * @author Jose
- * @overview <em>Abstraktní třída</em> pro kontrolery stavu, s nimiž bude pracovat StateManager
+ * @overview Definice API pro kontrolery stavu (s nimiž bude pracovat {@link JAS.StateManager}) + implementace jejich základních metod.
  */
 
 /**
- * <em>Abstraktní třída</em> pro kontrolery stavu, s nimiž bude pracovat StateManager
+ * <em>Abstraktní třída</em> pro kontrolery stavu.
  *
  * @memberof JAS
  * @class AStateController
@@ -16,42 +16,46 @@ JAS.AStateController = JAK.ClassMaker.makeClass({
 	VERSION: "1.0"
 });
 
+/* @constructs */
 JAS.AStateController.prototype.$constructor = function() {
 	this._id = "";
 };
 
 /**
- * Vratí ID stavu, který obstarává tento kontroler
+ * Vrací ID stavu, který obstarává tento kontroler.
  *
- * @return {string} ID stavu
+ * @return {string} ID stavu.
  */
 JAS.AStateController.prototype.getId = function() {
 	return this._id;
 };
 
 /**
- * Zda je změna stavu povolena
+ * Vyjadřuje zda je aktuálně změna stavu povolena.
+ * (Může se hodit například při rozpracovaném formuláři.)
  *
- * @return {boolean}
+ * @return {boolean} Pokud je změna stavu nyní nežádoucí tak false, jinak true.
  */
 JAS.AStateController.prototype.isChangeApproved = function() {
 	return true;
 };
 
 /**
- * Aktivuje kontroler
+ * Aktivuje kontroler.
  *
- * @param {object} params parametry stavu
+ * @abstract
+ * @param  {Object} params Parametry stavu.
  */
 JAS.AStateController.prototype.activate = function(params) {
 	throw new Error("Not implemented");
 };
 
 /**
- * Deaktivuje kontroler
+ * Deaktivuje kontroler.
  *
- * @param {JAS.AStateController} newState instance kontroleru, který bude následně aktivován
+ * @abstract
+ * @param  {JAS.AStateController} newStateCtrl Kontroler, který bude následně aktivován.
  */
-JAS.AStateController.prototype.deactivate = function(newState) {
+JAS.AStateController.prototype.deactivate = function(newStateCtrl) {
 	throw new Error("Not implemented");
 };
