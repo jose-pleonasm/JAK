@@ -6,6 +6,13 @@
  */
 
 /**
+ * @typedef {Object} jasConfig
+ * @property {JAS.AStateController[]} controllers Pole kontrolerů stavu.
+ * @property {Object} locationMiddleman Vrstva pro prezentaci stavu (např. URL stránky). Musí poskytovat metodu save.
+ * @property {Object} stateHistory Nástroj pro správu historie
+ */
+
+/**
  * Správce stavu aplikace. Přepíná mezi jednotlivými stavy.
  *
  * @memberof JAS
@@ -26,9 +33,9 @@ JAS.StateManager.prototype.$constructor = function() {
 };
 
 /**
- * Nakonfiguruje správce.
+ * Nakonfigurování.
  *
- * @param  {Object} configuration Konfigurační objekt.
+ * @param  {jasConfig} configuration Konfigurační objekt.
  */
 JAS.StateManager.prototype.configure = function(configuration) {
 	if (!configuration.controllers) {
@@ -49,6 +56,15 @@ JAS.StateManager.prototype.configure = function(configuration) {
 	this._history = configuration.stateHistory;
 };
 
+/**
+ * Změní/přepne stav.
+ *
+ * @param  {string} stateId         ID stavu.
+ * @param  {Object} params          Parametry stavu.
+ * @param  {string} stateUrl        Kompletní identifikátor stavu (ID stavu + parametry) - URL adresa. Tento identifikátor bude reprezentovat stav navenek.
+ * @param  {boolean} updateLocation Zda se má změna stavu promítnout v prezentační vrstvě.
+ * @param  {boolean} applyHistory   Zda se má uplatnit historie.
+ */
 JAS.StateManager.prototype.change = function(stateId, params, stateUrl, updateLocation, applyHistory) {
 	updateLocation = typeof updateLocation !== "undefined" ? !!updateLocation : true;
 	applyHistory = !!applyHistory;
